@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Security;
 
 namespace Dreambuild.AutoCAD
 {
@@ -204,6 +205,7 @@ namespace Dreambuild.AutoCAD
     /// <summary>
     /// The polyline needs cleanup exception.
     /// </summary>
+    [Serializable]
     public class PolylineNeedsCleanupException : Exception
     {
         /// <summary>
@@ -343,13 +345,31 @@ namespace Dreambuild.AutoCAD
     /// </summary>
     public static class Arx
     {
-        [DllImport("acad.exe", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, EntryPoint = "acedCmd")]
-        public static extern int acedCmd(IntPtr vlist);
+        public static int acedCmd(IntPtr vlist)
+        {
+            return NativeMethods.acedCmd(vlist);
+        }
 
-        [DllImport("acad.exe", CharSet = CharSet.Auto, CallingConvention = CallingConvention.Cdecl)]
-        public static extern int ads_queueexpr(string strExpr);
+        public static int ads_queueexpr(string strExpr)
+        {
+            return NativeMethods.ads_queueexpr(strExpr);
+        }
 
-        [DllImport("acad.exe", CharSet = CharSet.Auto, CallingConvention = CallingConvention.Cdecl, EntryPoint = "?acedPostCommand@@YAHPB_W@Z")]
-        public static extern int acedPostCommand(string strExpr);
+        public static int acedPostCommand(string strExpr)
+        {
+            return NativeMethods.acedPostCommand(strExpr);
+        }
+
+        internal static class NativeMethods
+        {
+            [DllImport("acad.exe", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl, EntryPoint = "acedCmd")]
+            public static extern int acedCmd(IntPtr vlist);
+
+            [DllImport("acad.exe", CharSet = CharSet.Auto, CallingConvention = CallingConvention.Cdecl)]
+            public static extern int ads_queueexpr(string strExpr);
+
+            [DllImport("acad.exe", CharSet = CharSet.Auto, CallingConvention = CallingConvention.Cdecl, EntryPoint = "?acedPostCommand@@YAHPB_W@Z")]
+            public static extern int acedPostCommand(string strExpr);
+        }
     }
 }
